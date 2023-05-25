@@ -3,15 +3,16 @@ from collections import deque, Counter
 import cv2
 from fastai.vision.all import *
 
-print('Loading our Inference model...')
+print("Loading our Inference model...")
 # load our inference model
-inf_model = load_learner('model.pkl')
-print('Model Loaded')
+inf_model = load_learner("model.pkl")
+print("Model Loaded")
 
 
 # define a deque to get rolling average of predictions
 # I go with the last 10 predictions
 rolling_predictions = deque([], maxlen=10)
+
 
 # get the most common item in the deque
 def most_common(D):
@@ -21,10 +22,11 @@ def most_common(D):
 
 def hand_area(img):
     # specify where hand should go
-    hand = img[50:324, 50:324]
+    hand = img[50:648, 50:648]
     # the images in the model were trainind on 200x200 pixels
-    hand = cv2.resize(hand, (200,200))
+    hand = cv2.resize(hand, (200, 200))
     return hand
+
 
 # capture video on the webcam
 cap = cv2.VideoCapture(0)
@@ -45,10 +47,10 @@ while True:
     _, frame = cap.read()
 
     # flip frame to feel more 'natural' to webcam
-    frame = cv2.flip(frame, flipCode = 1)
+    frame = cv2.flip(frame, flipCode=1)
 
     # draw a blue rectangle where to place hand
-    cv2.rectangle(frame, (50, 50), (324, 324), (255, 0, 0), 2)
+    cv2.rectangle(frame, (50, 50), (648, 648), (255, 0, 0), 2)
 
     # get the image
     inference_image = hand_area(frame)
@@ -60,18 +62,25 @@ while True:
 
     # our prediction is going to be the most common letter
     # in our rolling predictions
-    prediction_output = f'The predicted letter is {most_common(rolling_predictions)}'
+    prediction_output = f"The predicted letter is {most_common(rolling_predictions)}"
 
     # show predicted text
-    cv2.putText(frame, prediction_output, (10, 350), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 0), 2)
+    cv2.putText(
+        frame,
+        prediction_output,
+        (10, 350),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.9,
+        (255, 0, 0),
+        2,
+    )
     # show the frame
-    cv2.imshow('frame', frame)
+    cv2.imshow("frame", frame)
     # save the frames to out file
     # out.write(frame)
 
-
     # press `q` to exit
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
 # release VideoCapture()
